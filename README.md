@@ -1,2 +1,5 @@
 # hangman
-I wanted to try out Clojure, so I made a simple hangman game for a learning exercise.
+
+A simple hangman game created to try learn a little Clojure.
+
+`lein run`
