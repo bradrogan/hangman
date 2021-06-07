@@ -53,25 +53,38 @@
         win? (not (str/includes? output "_"))
         guesses-left (if (str/includes? output (str (last guesses))) guesses-left (dec guesses-left))]
     {:output output :guesses-left guesses-left :win? win?}))
+  
+  (defn print-win-message
+    [solved-puzzle]
+    (println "\n" solved-puzzle)
+    (println "\nYOU WIN!"))
+
+(defn print-game-over-message
+  [guesses answer]
+  (println "Guesses:" (str/join ", " guesses))
+  (println "\nThe answer was:" answer "\n")
+  (println "\nGAME OVER. Try again."))
+
+  (defn print-turn-message
+    [puzzle guesses guesses-left]
+    (println "\n" puzzle)
+    (println "Guesses:" (str/join ", " guesses))
+    (println "Guesses Remaining:" guesses-left "\n"))
 
 (defn take-turn
   [word num-guesses guesses]
   (let [guess (get-guess guesses)
-        turn-result (check-guess guess word num-guesses)]
-    (if (:win? turn-result)
+        turn-result (check-guess guess word num-guesses)
+        {:keys [win? output guesses-left]} turn-result]
+    (cond
+      win?
+      (print-win-message output)
+      (and (not win?) (pos? guesses-left))
       (do
-        (println "\n" (:output turn-result))
-        (println "\nYOU WIN!"))
-      (if (> (:guesses-left turn-result) 0)
-        (do
-          (println "\n" (:output turn-result))
-          (println "Guesses:" (str/join ", " guess))
-          (println "Guesses Remaining:" (:guesses-left turn-result) "\n")
-          (take-turn word (:guesses-left turn-result) guess))
-        (do
-          (println "Guesses:" (str/join ", " guess))
-          (println "\nThe answer was:" word "\n")
-          (println "\nGAME OVER. Try again."))))))
+        (print-turn-message output guess guesses-left)
+        (take-turn word guesses-left guess))
+      (and (not win?) (zero? guesses-left))
+      (print-game-over-message guess word))))
 
 (defn -main
   "Hangman!"
